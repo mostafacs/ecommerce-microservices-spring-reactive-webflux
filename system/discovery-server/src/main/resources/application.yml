@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: Discovery Server
+
+server:
+  port: 2222
+
+eureka:
+  instance:
+    hostname: localhost
+    nonSecurePort: 2222
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      default-zone: http://localhost:2222/eureka/
