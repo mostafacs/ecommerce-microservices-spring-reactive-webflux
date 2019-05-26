@@ -1,4 +1,4 @@
-package com.ecommerce.common.model.product;
+package demo.ecommerce.product.model;
 
 
 import lombok.AllArgsConstructor;

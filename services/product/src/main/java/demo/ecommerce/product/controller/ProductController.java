@@ -1,6 +1,6 @@
 package demo.ecommerce.product.controller;
 
-import com.ecommerce.common.model.product.Product;
+import demo.ecommerce.product.model.Product;
 import demo.ecommerce.product.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

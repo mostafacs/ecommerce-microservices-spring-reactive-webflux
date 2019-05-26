@@ -1,6 +1,5 @@
-package demo.ecommerce.product.config;
+package demo.ecommerce.config;
 
-import com.ecommerce.common.model.product.Product;
 import io.r2dbc.postgresql.PostgresqlConnectionConfiguration;
 import io.r2dbc.postgresql.PostgresqlConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +11,7 @@ import org.springframework.data.r2dbc.function.DatabaseClient;
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 
 @Configuration
-@EnableR2dbcRepositories(basePackages = {"demo.ecommerce.product.repository"})
+@EnableR2dbcRepositories(basePackages = {"demo.ecommerce.*.repository"})
 public class DatabaseConfig extends AbstractR2dbcConfiguration {
 
     @Value("${db.hostname}")

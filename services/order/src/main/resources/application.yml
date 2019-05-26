@@ -1,0 +1,17 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: Product Service
+
+db:
+  hostname: localhost
+  database: ecommerce
+  username: ecommerce
+  password: admin123
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:2222/eureka/
