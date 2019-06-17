@@ -18,9 +18,10 @@
     <dependencies>
         <dependency>
             <groupId>demo.ecommerce</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>framework</artifactId>
             <version>1.0</version>
         </dependency>
+
     </dependencies>
 
     <build>

@@ -1,6 +1,6 @@
 package demo.ecommerce.order.controller;
 
-import demo.ecommerce.order.model.ShoppingCart;
+import demo.ecommerce.order.ShoppingCart;
 import demo.ecommerce.order.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

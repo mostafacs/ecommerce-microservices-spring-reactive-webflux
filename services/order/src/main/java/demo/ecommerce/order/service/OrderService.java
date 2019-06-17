@@ -1,7 +1,7 @@
 package demo.ecommerce.order.service;
 
-import demo.ecommerce.order.model.ShoppingCart;
-import demo.ecommerce.order.model.ShoppingCartItem;
+import demo.ecommerce.order.ShoppingCart;
+import demo.ecommerce.order.ShoppingCartItem;
 import demo.ecommerce.order.repository.ShoppingCartItemRepository;
 import demo.ecommerce.order.repository.ShoppingCartRepository;
 import demo.ecommerce.product.repository.ProductRepository;
@@ -10,6 +10,10 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
+/**
+ * @Author Mostafa Albana
+ */
 
 @Service
 public class OrderService {

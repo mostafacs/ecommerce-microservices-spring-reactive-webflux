@@ -31,7 +31,7 @@
         <module>services/product</module>
         <module>services/order</module>
         <module>system/discovery-server</module>
-        <module>components/common</module>
+        <module>components/framework</module>
     </modules>
 
     <repositories>
@@ -101,6 +101,25 @@
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
             <scope>compile</scope>
+        </dependency>
+
+        <!-- Security Configs -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-resource-server</artifactId>
         </dependency>
 
         <!-- Testing Dependencies -->

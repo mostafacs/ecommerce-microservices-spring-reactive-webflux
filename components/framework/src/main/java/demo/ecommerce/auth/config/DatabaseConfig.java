@@ -1,4 +1,4 @@
-package demo.ecommerce.config;
+package demo.ecommerce.auth.config;
 
 import io.r2dbc.postgresql.PostgresqlConnectionConfiguration;
 import io.r2dbc.postgresql.PostgresqlConnectionFactory;

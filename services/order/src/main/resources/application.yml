@@ -3,7 +3,14 @@ server:
 
 spring:
   application:
-    name: Product Service
+    name: Order Service
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          #issuer-uri: http://localhost:8087/
+          jwk-set-uri: http://localhost:8087/.well-known/jwks
 
 db:
   hostname: localhost
