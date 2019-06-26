@@ -13,3 +13,11 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:2222/eureka/
+
+logging:
+  level:
+    org:
+      springframework:
+        jdbc:
+          core:
+            JdbcTemplate=debug:

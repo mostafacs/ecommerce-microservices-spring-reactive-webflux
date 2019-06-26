@@ -35,6 +35,9 @@ public class ShoppingCart {
     @Column("total_cost")
     private Double totalCost;
 
+    @Column("user_id")
+    private Long userId;
+
     @Transient
     private List<ShoppingCartItem> cartItemList;
 

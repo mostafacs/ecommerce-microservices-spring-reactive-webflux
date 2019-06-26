@@ -2,9 +2,9 @@ package demo.ecommerce.order.service;
 
 import demo.ecommerce.order.ShoppingCart;
 import demo.ecommerce.order.ShoppingCartItem;
-import demo.ecommerce.order.repository.ShoppingCartItemRepository;
-import demo.ecommerce.order.repository.ShoppingCartRepository;
-import demo.ecommerce.product.repository.ProductRepository;
+import demo.ecommerce.repository.order.ShoppingCartItemRepository;
+import demo.ecommerce.repository.order.ShoppingCartRepository;
+import demo.ecommerce.repository.product.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;

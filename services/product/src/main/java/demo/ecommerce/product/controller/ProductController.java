@@ -1,7 +1,7 @@
 package demo.ecommerce.product.controller;
 
 import demo.ecommerce.product.model.Product;
-import demo.ecommerce.product.repository.ProductRepository;
+import demo.ecommerce.repository.product.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;

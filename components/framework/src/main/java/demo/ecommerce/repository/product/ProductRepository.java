@@ -1,4 +1,4 @@
-package demo.ecommerce.product.repository;
+package demo.ecommerce.repository.product;
 
 import demo.ecommerce.product.model.Product;
 import org.springframework.data.r2dbc.repository.query.Query;
