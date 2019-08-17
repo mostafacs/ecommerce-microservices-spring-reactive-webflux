@@ -1,0 +1,45 @@
+version: '3.5'
+services:
+
+  discovery-server:
+    build:
+      context: .
+    hostname: discovery-server
+    environment:
+      - SPRING_APPLICATION_NAME=discovery-server
+      - SPRING_PROFILES_ACTIVE=dev
+    expose:
+      - "2222"
+    volumes:
+      - maven-home:/root/.m2
+    networks:
+      services-network-01:
+        aliases:
+          - discovery-server
+#
+#  user-service:
+#    build:
+#      context: ./user-service
+#    hostname: user-service
+#    environment:
+#      - SPRING_APPLICATION_NAME=user-service
+#      - SPRING_PROFILES_ACTIVE=dev
+#    command: ["mvn", "spring-boot:run"]
+#    ports:
+#      - "8080:8080"
+#    volumes:
+#      - maven-home:/root/.m2
+#    networks:
+#      services-network-01:
+#        aliases:
+#          - user-service
+#    depends_on:
+#      - discovery-server
+
+volumes:
+  maven-home:
+
+networks:
+  services-network-01:
+    name: services-network-01
+    driver: bridge

@@ -21,4 +21,4 @@ db:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:2222/eureka/
+      defaultZone: http://eureka:2222/eureka/

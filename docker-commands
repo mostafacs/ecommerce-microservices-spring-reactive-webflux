@@ -1,0 +1,3 @@
+docker run -it postgresdb /bin/bash
+docker run -p 5433:5432 postgresdb
+docker build --tag postgresdb .

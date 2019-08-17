@@ -34,6 +34,7 @@
         <module>system/discovery-server</module>
         <module>components/framework</module>
         <module>components/model</module>
+        <module>utils/postgresdb</module>
     </modules>
 
     <repositories>
