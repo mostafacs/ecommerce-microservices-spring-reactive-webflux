@@ -12,7 +12,7 @@ keystore:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:2222/eureka/
+      defaultZone: ${DISCOVERY_SERVER_URL}
 
 logging:
   level:

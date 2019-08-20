@@ -5,6 +5,15 @@ spring:
 server:
   port: 2222
 
+#eureka:
+#  instance:
+#    prefer-ip-address: true
+#  client:
+#    registerWithEureka: false
+#    fetchRegistry: false
+#    server:
+#      waitTimeInMsWhenSyncEmpty: 0
+
 eureka:
   instance:
     hostname: localhost

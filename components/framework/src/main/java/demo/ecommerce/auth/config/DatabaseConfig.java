@@ -13,26 +13,34 @@ import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 @EnableR2dbcRepositories(basePackages = {"demo.ecommerce.repository.**"})
 public class DatabaseConfig extends AbstractR2dbcConfiguration {
 
-    @Value("${db.hostname}")
+    @Value("${DATABASE_HOST}")
     String hostName;
 
-    @Value("${db.database}")
+    @Value("${DATABASE_NAME}")
     String database;
 
-    @Value("${db.username}")
+    @Value("${DATABASE_SCHEMA}")
+    String schema;
+
+    @Value("${DATABASE_USER}")
     String username;
 
-    @Value("${db.password}")
+    @Value("${DATABASE_PASSWORD}")
     String password;
+
+    @Value("${DATABASE_PORT}")
+    int port;
 
    @Bean
    @Override
    public PostgresqlConnectionFactory connectionFactory() {
         return new PostgresqlConnectionFactory(PostgresqlConnectionConfiguration.builder()
-            .host(hostName)
-            .database(database)
-            .username(username)
-            .password(password).build());
+                .host(hostName)
+                .database(database)
+                .schema(schema)
+                .port(port)
+                .username(username)
+                .password(password).build());
     }
 
 

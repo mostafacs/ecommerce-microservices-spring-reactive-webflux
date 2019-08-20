@@ -1,3 +1,11 @@
+docker build --tag postgresdb .
 docker run -it postgresdb /bin/bash
 docker run -p 5433:5432 postgresdb
-docker build --tag postgresdb .
+
+
+docker-compose -f docker-compose.dev.yml build
+docker-compose -f docker-compose-dev.yml up
+docker-compose -f docker-compose.dev.yml up discovery-server
+docker-compose -f docker-compose.dev.yml up authentication-server
+
+

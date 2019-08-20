@@ -1,0 +1,75 @@
+version: '2.1'
+
+services:
+  postgresdb:
+    build: storage/postgresdb
+    ports:
+      - 5433:5432
+
+  discovery-server:
+    build: system/discovery-server
+    ports:
+      - 2222:2222
+
+
+  authentication-server:
+    build: system/authentication
+    environment:
+      DISCOVERY_SERVER_URL: http://discovery-server:2222/eureka/
+      DATABASE_HOST: postgresdb
+      DATABASE_NAME: ecommerce
+      DATABASE_SCHEMA: ecommerce
+      DATABASE_PORT: 5433
+      DATABASE_USER: ecommerce
+      DATABASE_PASSWORD: admin123
+    ports:
+      - 8087:8087
+    depends_on:
+      - postgresdb
+      - discovery-server
+    links:
+      - discovery-server
+      - postgresdb
+
+
+  product-service:
+    build: services/product
+    environment:
+      DISCOVERY_SERVER_URL: http://discovery-server:2222/eureka/
+      DATABASE_HOST: postgresdb
+      DATABASE_NAME: ecommerce
+      DATABASE_SCHEMA: ecommerce
+      DATABASE_PORT: 5433
+      DATABASE_USER: ecommerce
+      DATABASE_PASSWORD: admin123
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgresdb
+      - discovery-server
+    links:
+      - discovery-server
+      - postgresdb
+
+
+  order-service:
+    build: services/order
+    environment:
+      DISCOVERY_SERVER_URL: http://discovery-server:2222/eureka/
+      DATABASE_HOST: postgresdb
+      DATABASE_NAME: ecommerce
+      DATABASE_SCHEMA: ecommerce
+      DATABASE_PORT: 5433
+      DATABASE_USER: ecommerce
+      DATABASE_PASSWORD: admin123
+    ports:
+      - 8081:8081
+    depends_on:
+      - postgresdb
+      - discovery-server
+    links:
+      - discovery-server
+      - postgresdb
+
+
+

@@ -1,6 +1,7 @@
 package demo.ecommerce.auth.config;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -23,6 +24,24 @@ import javax.sql.DataSource;
 @Order(-558484)
 public class DataBaseConfig extends JdbcConfiguration {
 
+    @Value("${DATABASE_HOST}")
+    String hostName;
+
+    @Value("${DATABASE_NAME}")
+    String database;
+
+    @Value("${DATABASE_SCHEMA}")
+    String schema;
+
+    @Value("${DATABASE_USER}")
+    String username;
+
+    @Value("${DATABASE_PASSWORD}")
+    String password;
+
+    @Value("${DATABASE_PORT}")
+    int port;
+
     @Bean
     NamedParameterJdbcOperations operations() {
         return new NamedParameterJdbcTemplate(dataSource());
@@ -37,9 +56,9 @@ public class DataBaseConfig extends JdbcConfiguration {
     @Bean
     public DataSource dataSource() {
         BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/ecommerce");
-        dataSource.setUsername("ecommerce");
-        dataSource.setPassword("admin123");
+        dataSource.setUrl(String.format("jdbc:postgresql://%s:%d/%s?currentSchema=%s", hostName, port, database, schema));
+        dataSource.setUsername(username);
+        dataSource.setPassword(password);
         dataSource.setDriverClassName("org.postgresql.Driver");
         dataSource.setInitialSize(5);
         dataSource.setMaxActive(12);

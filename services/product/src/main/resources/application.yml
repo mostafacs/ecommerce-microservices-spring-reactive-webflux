@@ -14,13 +14,7 @@ spring:
           jwk-set-uri: http://localhost:8087/.well-known/jwks
 
 
-db:
-  hostname: localhost
-  database: ecommerce
-  username: ecommerce
-  password: admin123
-
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:2222/eureka/
+      defaultZone: ${DISCOVERY_SERVER_URL}

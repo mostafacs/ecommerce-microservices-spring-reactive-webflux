@@ -30,11 +30,11 @@
     <modules>
         <module>services/product</module>
         <module>services/order</module>
-        <!--<module>system/authentication</module>-->
+        <module>system/authentication</module>
         <module>system/discovery-server</module>
         <module>components/framework</module>
         <module>components/model</module>
-        <module>utils/postgresdb</module>
+        <module>storage/postgresdb</module>
     </modules>
 
     <repositories>
