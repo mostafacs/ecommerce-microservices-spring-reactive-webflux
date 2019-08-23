@@ -13,6 +13,7 @@ public class Application  {
     public static void main( String[] args )
     {
         // curl admin:123@localhost:8087/oauth/token -d grant_type=client_credentials
+        // curl admin%40admin.com:123@localhost:8087/oauth/token -d grant_type=client_credentials
         SpringApplication.run(Application.class, args);
     }
 

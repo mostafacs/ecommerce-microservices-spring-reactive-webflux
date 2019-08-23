@@ -3,6 +3,7 @@ package demo.ecommerce.product.controller;
 import demo.ecommerce.product.model.Product;
 import demo.ecommerce.repository.product.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -15,7 +16,7 @@ public class ProductController {
     ProductRepository productRepository;
 
     @GetMapping("/list")
-    public Flux<Product> getProducts() {
+    public Flux<Product> getProducts(Authentication auth) {
         return productRepository.findAll();
     }
 

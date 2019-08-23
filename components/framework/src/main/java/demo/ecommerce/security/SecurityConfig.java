@@ -15,7 +15,7 @@ import org.springframework.util.Assert;
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
-    // configured in each class
+    // Defined in each Service use this config file.
     @Autowired
     String[] publicEndpoints;
 

@@ -19,7 +19,7 @@ services:
       DATABASE_HOST: postgresdb
       DATABASE_NAME: ecommerce
       DATABASE_SCHEMA: ecommerce
-      DATABASE_PORT: 5433
+      DATABASE_PORT: 5432
       DATABASE_USER: ecommerce
       DATABASE_PASSWORD: admin123
     ports:
@@ -28,8 +28,8 @@ services:
       - postgresdb
       - discovery-server
     links:
-      - discovery-server
       - postgresdb
+      - discovery-server
 
 
   product-service:
@@ -39,7 +39,7 @@ services:
       DATABASE_HOST: postgresdb
       DATABASE_NAME: ecommerce
       DATABASE_SCHEMA: ecommerce
-      DATABASE_PORT: 5433
+      DATABASE_PORT: 5432
       DATABASE_USER: ecommerce
       DATABASE_PASSWORD: admin123
     ports:
@@ -59,7 +59,7 @@ services:
       DATABASE_HOST: postgresdb
       DATABASE_NAME: ecommerce
       DATABASE_SCHEMA: ecommerce
-      DATABASE_PORT: 5433
+      DATABASE_PORT: 5432
       DATABASE_USER: ecommerce
       DATABASE_PASSWORD: admin123
     ports:
