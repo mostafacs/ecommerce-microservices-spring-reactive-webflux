@@ -4,7 +4,6 @@ import demo.ecommerce.product.model.Product;
 import demo.ecommerce.repository.product.ProductRepository;
 import demo.ecommerce.repository.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -41,7 +40,6 @@ public class ProductService {
     }
 
     public Flux<Product> findAllProductsPaged(Pageable pageable) {
-        Page a;
         return productRepository.findAllPageable(pageable.getPageSize(), pageable.getOffset());
     }
 
