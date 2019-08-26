@@ -1,7 +1,9 @@
 package demo.ecommerce.auth.security.model;
 
 import demo.ecommerce.auth.model.User;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.provider.ClientDetails;
 
 import java.util.*;
@@ -11,7 +13,7 @@ import java.util.*;
  */
 public class ClientDetailsInfo implements ClientDetails {
 
-    private final User user;
+    private User user;
 
     public ClientDetailsInfo(User user) {
         this.user = user;
@@ -42,9 +44,11 @@ public class ClientDetailsInfo implements ClientDetails {
         return false;
     }
 
+    // Actually used by webflux security filter.
     @Override
     public Set<String> getScope() {
-        return new HashSet<>(Arrays.asList("test"));
+        final String[] roles = user.getRoles().split(",");
+        return new HashSet<>(Arrays.asList(roles));
     }
 
     @Override
@@ -59,12 +63,17 @@ public class ClientDetailsInfo implements ClientDetails {
 
     @Override
     public Collection<GrantedAuthority> getAuthorities() {
-        return Arrays.asList(new GrantedAuthority() {
-            @Override
-            public String getAuthority() {
-                return "admin";
+
+        if (StringUtils.isNotEmpty(user.getRoles())) {
+            List<GrantedAuthority> gRoles = new ArrayList<>();
+            final String[] roles = user.getRoles().split(",");
+            for (String role : roles) {
+                gRoles.add(new SimpleGrantedAuthority(role));
             }
-        });
+
+            return gRoles;
+        }
+        return null;
     }
 
     @Override
@@ -85,7 +94,7 @@ public class ClientDetailsInfo implements ClientDetails {
     @Override
     public Map<String, Object> getAdditionalInformation() {
         HashMap additionInformation = new HashMap<>();
-        additionInformation.put("name", "mostafa additional");
+        additionInformation.put("userId", user.getId());
         return additionInformation;
     }
 

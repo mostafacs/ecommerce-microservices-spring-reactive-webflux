@@ -11,10 +11,16 @@ spring:
       resourceserver:
         jwt:
           #issuer-uri: http://localhost:8087/
-          jwk-set-uri: http://localhost:8087/.well-known/jwks
+          jwk-set-uri: ${JWKS_URL}
+
 
 
 eureka:
   client:
     service-url:
       defaultZone: ${DISCOVERY_SERVER_URL}
+
+#logging:
+#  level:
+#    root: DEBUG
+#    org.springframework.web: DEBUG

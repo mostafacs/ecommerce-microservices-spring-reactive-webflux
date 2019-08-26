@@ -11,7 +11,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     private static final String[] PUBLIC_RESOURCES = {
 
             "/.well-known**",
-            "/user",
+            "/user**",
+            "/user/**",
             "/sign-key/public",
             "/oauth/token",
             "/oauth/check_token",

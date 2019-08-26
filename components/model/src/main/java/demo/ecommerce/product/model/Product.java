@@ -8,6 +8,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.util.Date;
+
 
 @Data
 @AllArgsConstructor
@@ -24,5 +26,14 @@ public class Product {
 
     @Column("inventory_count")
     private Integer inventoryCounts;
+
+    @Column("user_id")
+    private Long userId;
+
+    @Column("created_on")
+    private Date createdOn;
+
+    @Column("updated_on")
+    private Date updatedOn;
 
 }

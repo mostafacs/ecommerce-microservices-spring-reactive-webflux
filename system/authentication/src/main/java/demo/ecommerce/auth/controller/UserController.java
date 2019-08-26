@@ -21,8 +21,15 @@ public class UserController {
         return principal;
     }
 
-    @PostMapping("/user")
-    public User register(@RequestBody User user) throws Exception {
+    @PostMapping("/user/merchant")
+    public User merchantRegister(@RequestBody User user) throws Exception {
+        user.setRoles("merchant");
+        return userService.createUser(user);
+    }
+
+    @PostMapping("/user/client")
+    public User clientRegister(@RequestBody User user) throws Exception {
+        user.setRoles("client");
         return userService.createUser(user);
     }
 }

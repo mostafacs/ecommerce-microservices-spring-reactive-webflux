@@ -53,8 +53,8 @@ ALTER TABLE ecommerce.product_id_seq OWNER TO ecommerce;
 
 CREATE TABLE ecommerce.product (
     id bigint DEFAULT nextval('ecommerce.product_id_seq'::regclass) NOT NULL,
-    title character(250),
-    sku character(150),
+    title character varying(250),
+    sku character varying(150),
     inventory_count integer
 );
 
