@@ -1,10 +1,13 @@
 package demo.ecommerce.order.controller;
 
-import demo.ecommerce.order.ShoppingCart;
+import demo.ecommerce.model.order.ShoppingCart;
 import demo.ecommerce.order.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -16,8 +19,11 @@ public class OrderController {
 
     @PostMapping // save
     @PutMapping  // update
-    public Mono<ShoppingCart> saveOrder(@RequestBody ShoppingCart shoppingCart) {
-        return orderService.saveShoppingCart(shoppingCart);
+    public Mono<ServerResponse> saveOrder(@RequestBody ShoppingCart shoppingCart, JwtAuthenticationToken auth) {
+        String email = auth.getTokenAttributes().get("client_id").toString();
+        return orderService.saveShoppingCart(shoppingCart, email).
+                flatMap(cart -> ServerResponse.ok().body(Mono.just(cart), ShoppingCart.class))
+                .onErrorResume(ex -> ServerResponse.badRequest().body(Mono.just(ex.getMessage()), String.class));
     }
 
     @GetMapping("/{orderId}")
@@ -26,8 +32,9 @@ public class OrderController {
     }
 
     @GetMapping
-    Flux<ShoppingCart> getAllShoppingCart() {
-        return orderService.getAllShoppingCarts();
+    Mono<Page<ShoppingCart>> getAllShoppingCart(JwtAuthenticationToken auth, @RequestParam Integer page, @RequestParam Integer pageSize) {
+        String email = auth.getTokenAttributes().get("client_id").toString();
+        return orderService.getUserShoppingCarts(email, PageRequest.of(page, pageSize));
     }
 
 

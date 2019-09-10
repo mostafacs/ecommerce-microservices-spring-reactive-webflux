@@ -1,6 +1,6 @@
 package demo.ecommerce.repository.user;
 
-import demo.ecommerce.user.User;
+import demo.ecommerce.model.user.User;
 import org.springframework.data.r2dbc.repository.query.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Mono;

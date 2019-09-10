@@ -1,10 +1,11 @@
-package demo.ecommerce.product.model;
+package demo.ecommerce.model.product;
 
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -35,5 +36,15 @@ public class Product {
 
     @Column("updated_on")
     private Date updatedOn;
+
+    @Transient
+    public void increaseInventory(int amount) {
+        inventoryCounts += amount;
+    }
+
+    @Transient
+    public void decreaseInventory(int amount) {
+        inventoryCounts -= amount;
+    }
 
 }

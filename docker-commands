@@ -1,12 +1,66 @@
-docker build --tag postgresdb .
+
+# Open bash
 docker run -it postgresdb /bin/bash
 docker run -it authentication-server /bin/bash
+
+# Docker Build commands
+docker build --tag postgresdb .
+docker build --tag authentication-server .
+docker build --tag product-service .
+docker build --tag order-service .
+
+# Docker Run Commands
 docker run -p 5433:5432 postgresdb
+docker run -p 8087:8087 authentication-server
+docker run -p 8080:8080 product-service
+docker run -p 8081:8081 order-service
 
 
+# Docker compose build & Run
 docker-compose -f docker-compose.dev.yml build
-docker-compose -f docker-compose-dev.yml up
+docker-compose -f docker-compose.dev.yml up
 docker-compose -f docker-compose.dev.yml up discovery-server
 docker-compose -f docker-compose.dev.yml up authentication-server
+docker-compose -f docker-compose.dev.yml up product-service
+..
 
+# Docker compose Stop All Services
+docker-compose -f docker-compose.dev.yml stop
+docker-compose -f docker-compose.dev.yml stop product-service
+
+
+
+# force rebuild
+docker build --no-cache --tag postgresdb .
+
+# Register
+
+curl -i -X POST \
+   -H "Content-Type:application/json" \
+   -d \
+'{
+  "email": "client",
+  "firstName": "Mostafa",
+  "lastName": "Albana",
+  "password": "123"
+}' \
+ 'http://localhost:8087/user/client'
+
+--------------------------------------------------------------
+
+curl -i -X POST \
+    -H "Content-Type:application/json" \
+    -d \
+ '{
+   "email": "merchant",
+   "firstName": "Mostafa",
+   "lastName": "Albana",
+   "password": "123"
+ }' \
+  'http://localhost:8087/user/merchant'
+
+
+# Login
+curl client:123@localhost:8087/oauth/token -d grant_type=client_credentials
+curl merchant:123@localhost:8087/oauth/token -d grant_type=client_credentials
 

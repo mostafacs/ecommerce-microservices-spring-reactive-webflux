@@ -1,4 +1,4 @@
-package demo.ecommerce.user;
+package demo.ecommerce.model.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

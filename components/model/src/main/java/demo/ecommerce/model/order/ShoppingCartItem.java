@@ -1,7 +1,7 @@
-package demo.ecommerce.order;
+package demo.ecommerce.model.order;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import demo.ecommerce.product.model.Product;
+import demo.ecommerce.model.product.Product;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

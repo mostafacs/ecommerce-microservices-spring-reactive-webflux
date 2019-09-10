@@ -1,4 +1,4 @@
-package demo.ecommerce.order;
+package demo.ecommerce.model.order;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -37,6 +38,12 @@ public class ShoppingCart {
 
     @Column("user_id")
     private Long userId;
+
+    @Column("created_on")
+    private Date createdOn;
+
+    @Column("updated_on")
+    private Date updatedOn;
 
     @Transient
     private List<ShoppingCartItem> cartItemList;

@@ -1,14 +1,14 @@
 package demo.ecommerce.product.controller;
 
-import demo.ecommerce.product.model.Product;
+import demo.ecommerce.model.product.Product;
 import demo.ecommerce.product.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -20,14 +20,15 @@ public class ProductController {
 
 
     @GetMapping("/list")
-    public Flux<Product> getProducts(@RequestParam Integer page, @RequestParam Integer pageSize) {
+    public Mono<Page<Product>> getProducts(@RequestParam Integer page, @RequestParam Integer pageSize) {
         return productService.findAllProductsPaged(PageRequest.of(page, pageSize));
     }
 
 
-    @GetMapping("/list/user/{userId}")
-    public Flux<Product> getUserProducts(@PathVariable Long userId, @RequestParam Integer page, @RequestParam Integer pageSize) {
-        return productService.findUserProductsPaged(userId, PageRequest.of(page, pageSize));
+    @GetMapping("/list/merchant")
+    public Mono<Page<Product>> getUserProducts(JwtAuthenticationToken auth, @RequestParam Integer page, @RequestParam Integer pageSize) {
+        String email = auth.getTokenAttributes().get("client_id").toString();
+        return productService.findUserProductsPaged(email, PageRequest.of(page, pageSize));
     }
 
     // Not available for clients
@@ -48,12 +49,12 @@ public class ProductController {
     }
 
     @GetMapping("/list/available")
-    public Flux<Product> getNonZeroInventoryProducts(@RequestParam Integer page, @RequestParam Integer pageSize) {
+    public Mono<Page<Product>> getNonZeroInventoryProducts(@RequestParam Integer page, @RequestParam Integer pageSize) {
         return productService.findAvailableProductsPaged(PageRequest.of(page, pageSize));
     }
 
     @GetMapping("/list/not-available")
-    public Flux<Product> getZeroInventoryProducts(@RequestParam Integer page, @RequestParam Integer pageSize) {
+    public Mono<Page<Product>> getZeroInventoryProducts(@RequestParam Integer page, @RequestParam Integer pageSize) {
         return productService.findNotAvailableProductsPaged(PageRequest.of(page, pageSize));
     }
 

@@ -14,15 +14,9 @@ services:
 
   authentication-server:
     build: system/authentication
-    command: mvn clean install
+    env_file:
+      - common.env
     environment:
-      DISCOVERY_SERVER_URL: http://discovery-server:2222/eureka/
-      DATABASE_HOST: postgresdb
-      DATABASE_NAME: ecommerce
-      DATABASE_SCHEMA: ecommerce
-      DATABASE_PORT: 5432
-      DATABASE_USER: ecommerce
-      DATABASE_PASSWORD: admin123
       EXTRA_JAR_ARGS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8187
     ports:
       - 8087:8087
@@ -37,16 +31,9 @@ services:
 
   product-service:
     build: services/product
-    command: mvn clean install
+    env_file:
+      - common.env
     environment:
-      DISCOVERY_SERVER_URL: http://discovery-server:2222/eureka/
-      JWKS_URL: http://authentication-server:8087/.well-known/jwks
-      DATABASE_HOST: postgresdb
-      DATABASE_NAME: ecommerce
-      DATABASE_SCHEMA: ecommerce
-      DATABASE_PORT: 5432
-      DATABASE_USER: ecommerce
-      DATABASE_PASSWORD: admin123
       EXTRA_JAR_ARGS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8180
     ports:
       - 8080:8080
@@ -63,18 +50,13 @@ services:
 
   order-service:
     build: services/order
-    command: mvn clean install
+    env_file:
+      - common.env
     environment:
-      DISCOVERY_SERVER_URL: http://discovery-server:2222/eureka/
-      JWKS_URL: http://authentication-server:8087/.well-known/jwks
-      DATABASE_HOST: postgresdb
-      DATABASE_NAME: ecommerce
-      DATABASE_SCHEMA: ecommerce
-      DATABASE_PORT: 5432
-      DATABASE_USER: ecommerce
-      DATABASE_PASSWORD: admin123
+      EXTRA_JAR_ARGS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8181
     ports:
       - 8081:8081
+      - 8181:8181
     depends_on:
       - postgresdb
       - discovery-server
