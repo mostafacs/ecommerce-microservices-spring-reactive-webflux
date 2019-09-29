@@ -25,6 +25,13 @@ public class Product {
 
     private String title;
 
+    @Column("cost_price")
+    private Double costPrice;
+
+    @Column("sell_price")
+    private Double sellPrice;
+
+
     @Column("inventory_count")
     private Integer inventoryCounts;
 

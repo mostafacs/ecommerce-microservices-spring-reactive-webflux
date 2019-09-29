@@ -27,6 +27,7 @@ public class ShoppingCart {
     @Column("total_quantity")
     private Integer totalQuantity;
 
+    // totalCost - shipping
     @Column("sub_total_price")
     private Double subTotalPrice;
 

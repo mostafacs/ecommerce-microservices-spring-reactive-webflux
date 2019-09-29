@@ -1,6 +1,7 @@
 package demo.ecommerce.model.order;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import demo.ecommerce.model.product.Product;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,13 +33,23 @@ public class ShoppingCartItem {
 
     private Integer quantity;
 
+    // product cost price
+    @JsonIgnore
+    @Column("unit_cost_price")
+    private Double unitCostPrice;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    // product selling price
     @Column("unit_price")
     private Double unitPrice;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    // (unit-price * quantity) + shipping
     @Column("total_price")
     private Double totalPrice;
 
+    // calculated from any external sources
     @Column("shipping_cost")
-    private Double shippingCost;
+    private Double shippingCost = 0.0;
 
 }

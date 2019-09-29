@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -50,13 +51,48 @@ public class OrderService {
     DatabaseClient db;
 
 
+    Mono<ShoppingCart> updateCartData(ShoppingCart cart, Flux<Product> productFlux) {
+        return productFlux.collectList().flatMap(products -> {
+            BigDecimal totalCost = BigDecimal.ZERO;
+            BigDecimal totalShipping = BigDecimal.ZERO;
+            int totalQuantity = 0;
+
+            for (int i = 0; i < cart.getCartItemList().size(); i++) {
+                ShoppingCartItem item = cart.getCartItemList().get(i);
+
+                // set price data from product
+                item.setUnitPrice(products.get(i).getSellPrice());
+                item.setUnitCostPrice(products.get(i).getCostPrice());
+
+                BigDecimal itemTotal = BigDecimal.valueOf(item.getQuantity()).multiply(BigDecimal.valueOf(item.getUnitPrice()));
+                item.setTotalPrice(itemTotal.doubleValue());
+
+                totalCost = totalCost.add(itemTotal);
+                totalQuantity += item.getQuantity();
+                totalShipping = totalShipping.add(BigDecimal.valueOf(item.getShippingCost()));
+            }
+
+            cart.setSubTotalPrice(totalCost.doubleValue());
+            cart.setTotalShippingCost(totalShipping.doubleValue());
+            // total + shipping
+            cart.setTotalCost(totalCost.add(totalShipping).doubleValue());
+            cart.setTotalQuantity(totalQuantity);
+
+            return Mono.just(cart);
+        });
+    }
+
     private Mono<ShoppingCart> validateQuantities(ShoppingCart cart, Function<ShoppingCart, Mono<ShoppingCart>> onSuccess, Function<String, Mono<ShoppingCart>> onFail) {
         Mono<ShoppingCart> existingCart = null;
         if (cart.getId() != null) {
             existingCart = shoppingCartRepository.findById(cart.getId()).flatMap(this::fillCartWithCartItems);
         }
-        List<Long> productIds = cart.getCartItemList().stream().map(ShoppingCartItem::getProductId).collect(Collectors.toList());
+
+        // get all products ids from  cart items
+        List<Long> productIds = cart.getCartItemList().stream().map(itm -> itm.getProduct().getId()).collect(Collectors.toList());
         final Flux<Product> newCartProducts = productRepository.findAllById(productIds);
+
+
         Flux<Product> products;
         if (existingCart != null) {
 
@@ -75,7 +111,8 @@ public class OrderService {
         AtomicInteger index = new AtomicInteger(0);
         StringBuilder errorMessageBuilder = new StringBuilder();
         Flux<Product> validProducts = newCartProducts.filter(product -> {
-            if (product.getInventoryCounts() >= cart.getCartItemList().get(index.getAndIncrement()).getQuantity()) {
+            int cartIndex = index.getAndIncrement();
+            if (product.getInventoryCounts() >= cart.getCartItemList().get(cartIndex).getQuantity()) {
                 return true;
             } else {
                 if (errorMessageBuilder.length() > 0) errorMessageBuilder.append(", ");
@@ -84,12 +121,16 @@ public class OrderService {
             }
         });
 
-        if (validProducts.count() == products.count()) {
-            return onSuccess.apply(cart);
-        } else {
+        return validProducts.count().flatMap(validCount ->
+                products.count().flatMap(allproductsCount -> {
+                    if (validCount.equals(allproductsCount)) {
+                        return onSuccess.apply(cart);
+                    } else {
 
-            return onFail.apply(errorMessageBuilder.toString());
-        }
+                        return onFail.apply(errorMessageBuilder.toString());
+                    }
+                })
+        );
     }
 
     private Mono<Map<Long, Product>> restoreProductsQuantities(ShoppingCart oldCart) {
@@ -110,6 +151,7 @@ public class OrderService {
 
     private Flux<Product> updateCartProductQuantities(ShoppingCart cart) {
         final Mono<Map<Long, Product>> oldProductsRestored;
+        // if edit CartOrder increase counts of products from old cart
         if (cart.getId() != null) {
             Mono<ShoppingCart> existingCart = shoppingCartRepository.findById(cart.getId()).flatMap(this::fillCartWithCartItems);
             oldProductsRestored = existingCart.flatMap(this::restoreProductsQuantities);
@@ -118,7 +160,7 @@ public class OrderService {
         }
 
         AtomicInteger indexer = new AtomicInteger(0);
-        List<Long> productIds = cart.getCartItemList().stream().map(ShoppingCartItem::getProductId).collect(Collectors.toList());
+        List<Long> productIds = cart.getCartItemList().stream().map(item -> item.getProduct().getId()).collect(Collectors.toList());
         Flux<Product> newCartProducts = productRepository.findAllById(productIds);
 
         return newCartProducts.flatMap(newProduct -> {
@@ -157,9 +199,10 @@ public class OrderService {
     private Mono<ShoppingCart> internalSaveShoppingCart(ShoppingCart shoppingCart) {
 
         // update product Quantities and save into database
-        productRepository.saveAll(updateCartProductQuantities(shoppingCart)).subscribe();
+        // i don't call subscribe here because the next function call will call flapMap
+        Flux<Product> savedProducts = productRepository.saveAll(updateCartProductQuantities(shoppingCart)); //.subscribe
 
-        Mono<ShoppingCart> savedShoppingCart = shoppingCartRepository.save(shoppingCart);
+        Mono<ShoppingCart> savedShoppingCart = updateCartData(shoppingCart, savedProducts).flatMap(cartWithData -> shoppingCartRepository.save(cartWithData));
 
         // assign saveShoppingCart is required to fill with data enhanced from calling flatMap
         savedShoppingCart = savedShoppingCart.flatMap(savedCart -> {
