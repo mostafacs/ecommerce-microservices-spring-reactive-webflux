@@ -260,6 +260,8 @@ public class OrderService {
 
         if (cartItem.getProductId() != null) {
             return productRepository.findById(cartItem.getProductId()).flatMap(product -> {
+                // hide cost price details from end-user client (available only for merchants
+                product.setCostPrice(null);
                 cartItem.setProduct(product);
                 return Mono.just(cartItem);
             });
