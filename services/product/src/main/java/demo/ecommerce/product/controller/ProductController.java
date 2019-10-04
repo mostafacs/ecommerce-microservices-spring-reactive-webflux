@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/product")
 public class ProductController {
 
     @Autowired

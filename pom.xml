@@ -32,6 +32,7 @@
         <module>services/order</module>
         <module>system/authentication</module>
         <module>system/discovery-server</module>
+        <module>system/proxy-server</module>
         <module>components/framework</module>
         <module>components/model</module>
         <module>storage/postgresdb</module>

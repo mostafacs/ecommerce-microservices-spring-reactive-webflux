@@ -1,0 +1,27 @@
+server:
+  port: 8765
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${DISCOVERY_SERVER_URL}
+
+zuul:
+  ignoredServices: '*'
+  routes:
+    authentication:
+      serviceId: authentication-service
+      path: /uaa/**
+      sensitive-headers: Cookie,Set-Cookie
+
+    products:
+      serviceId: product-service
+      path: /product/**
+
+    orders:
+      serviceId: order-service
+      path: /order/**
+
+spring:
+  application:
+    name: Proxy

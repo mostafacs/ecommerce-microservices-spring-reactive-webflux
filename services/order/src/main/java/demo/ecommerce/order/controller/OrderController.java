@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/order")
 public class OrderController {
 
     @Autowired

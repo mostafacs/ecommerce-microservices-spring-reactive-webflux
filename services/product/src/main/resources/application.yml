@@ -4,7 +4,7 @@ server:
 
 spring:
   application:
-    name: Product Service
+    name: product-service
 
   security:
     oauth2:

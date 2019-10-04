@@ -67,4 +67,20 @@ services:
       - authentication-server
 
 
+  proxy-service:
+    build: system/proxy-server
+    env_file:
+      - common.env
+    ports:
+      - 8765:8765
+    depends_on:
+      - postgresdb
+      - discovery-server
+      - authentication-server
+      - product-service
+      - order-service
+    links:
+      - discovery-server
+
+
 

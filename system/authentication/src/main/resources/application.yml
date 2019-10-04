@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: Authentication-Service
+    name: authentication-service
 
 keystore:
   password: admin123

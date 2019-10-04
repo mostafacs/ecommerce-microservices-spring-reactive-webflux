@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: Order Service
+    name: order-service
 
   security:
     oauth2:
