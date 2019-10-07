@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: product-service
+  cloud:
+    config:
+      uri: ${CONFIG_SERVICE_URL}
+      fail-fast: true
+#      password: ${CONFIG_SERVICE_PASSWORD}
+#      username: user

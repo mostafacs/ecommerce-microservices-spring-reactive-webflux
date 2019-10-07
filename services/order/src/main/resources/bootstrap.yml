@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: order-service
+  cloud:
+    config:
+      uri: ${CONFIG_SERVICE_URL}
+      fail-fast: true

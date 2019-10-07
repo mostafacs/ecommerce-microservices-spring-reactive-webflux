@@ -1,6 +1,11 @@
 version: '2.1'
 
 services:
+  config-server:
+    build: system/config
+    ports:
+      - 8111:8111
+
   postgresdb:
     build: storage/postgresdb
     ports:
@@ -8,8 +13,14 @@ services:
 
   discovery-server:
     build: system/discovery-server
+    env_file:
+      - common.env
     ports:
       - 2222:2222
+    depends_on:
+      - config-server
+    links:
+      - config-server
 
 
   authentication-server:
@@ -25,6 +36,7 @@ services:
       - postgresdb
       - discovery-server
     links:
+      - config-server
       - postgresdb
       - discovery-server
 
@@ -43,6 +55,7 @@ services:
       - discovery-server
       - authentication-server
     links:
+      - config-server
       - discovery-server
       - postgresdb
       - authentication-server
@@ -62,13 +75,14 @@ services:
       - discovery-server
       - authentication-server
     links:
+      - config-server
       - discovery-server
       - postgresdb
       - authentication-server
 
 
-  proxy-service:
-    build: system/proxy-server
+  gateway:
+    build: system/gateway
     env_file:
       - common.env
     ports:
@@ -80,6 +94,7 @@ services:
       - product-service
       - order-service
     links:
+      - config-server
       - discovery-server
 
 

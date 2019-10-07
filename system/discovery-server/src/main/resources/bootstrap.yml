@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: discovery-service
+  cloud:
+    config:
+      uri: ${CONFIG_SERVICE_URL}
+      fail-fast: true
+
+
+eureka:
+  instance:
+    hostname: localhost
+    nonSecurePort: 2222
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+  #    service-url:
+  #      default-zone: http://localhost:2222/eureka/
+  server:
+    wait-time-in-ms-when-sync-empty: 0
+    enable-self-preservation: false

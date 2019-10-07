@@ -2,6 +2,7 @@
 # Open bash
 docker run -it postgresdb /bin/bash
 docker run -it authentication-server /bin/bash
+docker run -it discovery-server /bin/bash
 
 # Docker Build commands
 docker build --tag postgresdb .
