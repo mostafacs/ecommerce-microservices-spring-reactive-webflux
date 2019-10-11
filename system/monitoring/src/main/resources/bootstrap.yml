@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: monitoring
+  cloud:
+    config:
+      uri: ${CONFIG_SERVICE_URL}
+      fail-fast: true

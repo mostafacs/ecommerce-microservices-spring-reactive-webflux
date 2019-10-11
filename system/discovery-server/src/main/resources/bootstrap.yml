@@ -1,10 +1,9 @@
+server:
+  port: 2222
+
 spring:
   application:
     name: discovery-service
-  cloud:
-    config:
-      uri: ${CONFIG_SERVICE_URL}
-      fail-fast: true
 
 
 eureka:

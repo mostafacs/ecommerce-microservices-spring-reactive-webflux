@@ -34,6 +34,7 @@
         <module>system/authentication</module>
         <module>system/discovery-server</module>
         <module>system/gateway</module>
+        <module>system/monitoring</module>
         <module>components/framework</module>
         <module>components/model</module>
         <module>storage/postgresdb</module>

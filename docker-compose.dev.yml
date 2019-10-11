@@ -11,6 +11,7 @@ services:
     ports:
       - 5433:5432
 
+
   discovery-server:
     build: system/discovery-server
     env_file:
@@ -51,8 +52,6 @@ services:
       - 8080:8080
       - 8180:8180 #debug port
     depends_on:
-      - postgresdb
-      - discovery-server
       - authentication-server
     links:
       - config-server
@@ -71,8 +70,6 @@ services:
       - 8081:8081
       - 8181:8181
     depends_on:
-      - postgresdb
-      - discovery-server
       - authentication-server
     links:
       - config-server
@@ -88,11 +85,20 @@ services:
     ports:
       - 8765:8765
     depends_on:
-      - postgresdb
-      - discovery-server
-      - authentication-server
       - product-service
       - order-service
+    links:
+      - config-server
+      - discovery-server
+
+  monitor:
+    build: system/monitoring
+    env_file:
+      - common.env
+    ports:
+      - 8000:8000
+    depends_on:
+      - discovery-server
     links:
       - config-server
       - discovery-server
