@@ -1,20 +1,12 @@
 server:
   port: 8765
 
-zuul:
-  ignoredServices: '*'
-  routes:
-    authentication:
-      serviceId: authentication-service
-      path: /uaa/**
-      sensitive-headers:
+management:
+  endpoint:
+    gateway:
+      enabled: true
 
-    products:
-      serviceId: product-service
-      path: /product/**
-      sensitive-headers:
-
-    orders:
-      serviceId: order-service
-      path: /order/**
-      sensitive-headers:
+  endpoints:
+    web:
+      exposure:
+        include: gateway

@@ -18,16 +18,16 @@ docker run -p 8081:8081 order-service
 
 
 # Docker compose build & Run
-docker-compose -f docker-compose.dev.yml build
-docker-compose -f docker-compose.dev.yml up
-docker-compose -f docker-compose.dev.yml up discovery-server
-docker-compose -f docker-compose.dev.yml up authentication-server
-docker-compose -f docker-compose.dev.yml up product-service
+docker-compose build
+docker-compose up
+docker-compose up discovery-server
+docker-compose up authentication-server
+docker-compose up product-service
 ..
 
 # Docker compose Stop All Services
-docker-compose -f docker-compose.dev.yml stop
-docker-compose -f docker-compose.dev.yml stop product-service
+docker-compose stop
+docker-compose stop product-service
 
 
 
