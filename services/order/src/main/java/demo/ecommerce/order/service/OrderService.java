@@ -3,6 +3,7 @@ package demo.ecommerce.order.service;
 import demo.ecommerce.model.order.ShoppingCart;
 import demo.ecommerce.model.order.ShoppingCartItem;
 import demo.ecommerce.model.product.Product;
+import demo.ecommerce.model.user.User;
 import demo.ecommerce.repository.order.ShoppingCartItemRepository;
 import demo.ecommerce.repository.order.ShoppingCartRepository;
 import demo.ecommerce.repository.product.ProductRepository;
@@ -188,11 +189,35 @@ public class OrderService {
                 cart.setCreatedOn(new Date());
             }
             cart.setUpdatedOn(new Date());
-            return validateQuantities(cart, this::internalSaveShoppingCart, errorMessage -> {
-                throw new IllegalArgumentException(errorMessage);
-            });
+
+            // validate client not save another cart
+            return validateUserId(cart, user).flatMap(vc ->
+                    validateQuantities(cart, this::internalSaveShoppingCart, errorMessage -> {
+                        throw new IllegalArgumentException(errorMessage);
+                    })
+            );
+
+
         });
 
+    }
+
+    Mono<ShoppingCart> validateUserId(ShoppingCart cart, User user) {
+
+        if (cart.getId() != null) {
+            Mono<ShoppingCart> cartMono = shoppingCartRepository.findById(cart.getId());
+            return validateUserId(cartMono, user);
+        }
+        return Mono.just(cart);
+    }
+
+    Mono<ShoppingCart> validateUserId(Mono<ShoppingCart> cart, User user) {
+        return cart.flatMap(dbCart -> {
+            if (!dbCart.getUserId().equals(user.getId())) {
+                throw new IllegalArgumentException("Not authorized to save this order");
+            }
+            return cart;
+        });
     }
 
     // You should never call a blocking method within a method that returns a reactive type
@@ -227,11 +252,17 @@ public class OrderService {
     }
 
 
-    public Mono<ShoppingCart> getShoppingCart(Long cartId) {
+    public Mono<ShoppingCart> getShoppingCart(Long cartId, String email) {
 
-        Mono<ShoppingCart> shoppingCartMono = shoppingCartRepository.findById(cartId);
-        shoppingCartMono = shoppingCartMono.flatMap(this::fillCartWithCartItems);
-        return shoppingCartMono;
+        final Mono<ShoppingCart> shoppingCartMono = shoppingCartRepository.findById(cartId);
+
+        return userRepository.getUserByEmail(email).flatMap(user ->
+
+                validateUserId(shoppingCartMono, user).flatMap(valid ->
+                        shoppingCartMono.flatMap(this::fillCartWithCartItems)
+                )
+        );
+
     }
 
 

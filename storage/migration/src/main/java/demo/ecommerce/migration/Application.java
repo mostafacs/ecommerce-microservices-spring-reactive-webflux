@@ -1,4 +1,4 @@
-package demo.ecommerce.postgres;
+package demo.ecommerce.migration;
 
 import org.flywaydb.core.Flyway;
 
@@ -7,18 +7,21 @@ import org.flywaydb.core.Flyway;
  */
 public class Application {
 
-    private static final String urlEnvName = "database_url";
-    private static final String schemaEnvName = "schema_name";
-    private static final String userEnvName = "user_name";
-    private static final String passwordEnvName = "user_password";
+    private static final String hostEnvName = "DATABASE_HOST";
+    private static final String portEnvName = "DATABASE_PORT";
+    private static final String schemaEnvName = "DATABASE_SCHEMA";
+    private static final String userEnvName = "DATABASE_USER";
+    private static final String passwordEnvName = "DATABASE_PASSWORD";
 
     public static void main(String[] args) throws Exception {
 
-        String url = System.getenv(urlEnvName);
+
+        String host = System.getenv(hostEnvName);
+        String port = System.getenv(portEnvName);
         String schema = System.getenv(schemaEnvName);
         String user = System.getenv(userEnvName);
         String password = System.getenv(passwordEnvName);
-
+        String url = String.format("jdbc:postgresql://%s:%s/%s", host, port, schema);
 
         System.out.println(url);
         System.out.println(schema);

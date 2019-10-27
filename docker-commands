@@ -1,4 +1,16 @@
+------------- Docker compose build & Run ----------
+docker-compose build
+docker-compose up
+docker-compose up discovery-server
+docker-compose up authentication-server
+docker-compose up product-service
+..
 
+# Docker compose Stop All Services
+docker-compose stop
+docker-compose stop product-service
+
+------------ Docker ---------
 # Open bash
 docker run -it postgresdb /bin/bash
 docker run -it authentication-server /bin/bash
@@ -16,20 +28,9 @@ docker run -p 8087:8087 authentication-server
 docker run -p 8080:8080 product-service
 docker run -p 8081:8081 order-service
 
-
-# Docker compose build & Run
-docker-compose build
-docker-compose up
-docker-compose up discovery-server
-docker-compose up authentication-server
-docker-compose up product-service
-..
-
-# Docker compose Stop All Services
-docker-compose stop
-docker-compose stop product-service
-
-
+# Clear all Docker
+docker rm $(docker ps -a -q) -f
+docker volume prune
 
 # force rebuild
 docker build --no-cache --tag postgresdb .

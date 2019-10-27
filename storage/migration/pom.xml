@@ -6,7 +6,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>demo.ecommerce</groupId>
-    <artifactId>postgresdb</artifactId>
+    <artifactId>migration</artifactId>
     <version>1.0</version>
 
     <properties>
@@ -91,7 +91,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>demo.ecommerce.postgres.Application</mainClass>
+                            <mainClass>demo.ecommerce.migration.Application</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

@@ -23,9 +23,9 @@ public class ProductController {
         return productService.findAllProductsPaged(PageRequest.of(page, pageSize));
     }
 
-
+    @PreAuthorize("hasAnyAuthority('SCOPE_merchant', 'SCOPE_admin')")
     @GetMapping("/list/merchant")
-    public Mono<Page<Product>> getUserProducts(JwtAuthenticationToken auth, @RequestParam Integer page, @RequestParam Integer pageSize) {
+    public Mono<Page<Product>> getMerchantProducts(JwtAuthenticationToken auth, @RequestParam Integer page, @RequestParam Integer pageSize) {
         String email = auth.getTokenAttributes().get("client_id").toString();
         return productService.findUserProductsPaged(email, PageRequest.of(page, pageSize));
     }

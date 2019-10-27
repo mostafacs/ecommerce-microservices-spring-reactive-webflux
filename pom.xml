@@ -37,7 +37,7 @@
         <module>system/monitoring</module>
         <module>components/framework</module>
         <module>components/model</module>
-        <module>storage/postgresdb</module>
+        <module>storage/migration</module>
     </modules>
 
     <repositories>

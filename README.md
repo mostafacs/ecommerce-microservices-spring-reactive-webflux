@@ -17,22 +17,11 @@ I'm planning to implement another version from project with independent microser
 
 I have split services into two types system and logical services.
 
+##Features
+
+Secured, Authorized and Paginated endpoints.
+
 ## Functional services
-
-TODO (Documentation)
-
-
-###  System Services
-Core service to implement Netflix OSS design architecture and Services token security 
-
-### Config Service
-  Provides configuration for all other services (centralize configuration for all services).   <br>
-Details: [Spring Cloud Config](http://cloud.spring.io/spring-cloud-config/spring-cloud-config.html)
-
-### Discovery Service
-It allows automatic detection of network locations for service instances, which could have dynamically assigned addresses because of auto-scaling, 
-failures and upgrades (Every service register in this service after running).   <br>
-Details: [Spring Cloud Config](http://cloud.spring.io/spring-cloud-config/spring-cloud-config.html)
 
 ### Authentication Service
 Authorization responsibilities for all other services which grants [OAuth2 tokens](https://tools.ietf.org/html/rfc6749) for the backend resource services.
@@ -46,12 +35,50 @@ All other secured services must set jwk uri for endpoint implemented on this ser
 ```
 Endpoints
 
-Method	| Path	| Description	| User authenticated	| Available from UI
-------------- | ------------------------- | ------------- |:-------------:|:----------------:|
-GET	| /.well-known/jwks	| Get JSON Web Key Set (JWKS) is a set of keys containing the public keys that should be used to verify JWT token	|  | 	
-POST	| /user/merchant	| Register new merchant account (with merchant role)	| × | ×
-POST	| /user/client	| Register new client account	(with client role)|   | 	×
-GET	| /user	| Get current login user information | × | ×
+Method	| Path	| Description	| User authenticated	
+------------- | ------------------------- | ------------- |:-------------:|
+GET	| /.well-known/jwks	| System endpoint to get JSON Web Key Set (JWKS) is a set of keys containing the public keys that should be used to verify JWT token	|  
+POST	| /user/merchant	| Register new merchant account (with merchant role)	|  
+POST	| /user/client	| Register new client account	(with client role)|   | 
+GET	| /user	| Get current login user information | × 
+
+### Product Service
+Manage products information and inventory
+Endpoints
+
+Method	| Path	| Description	| User authenticated	| Role
+------------- | ------------------------- | ------------- |:-------------:| :-------------:|
+GET	| /list?page={page}&pageSize={pageSize}	| Get all products	|  x | any |
+GET	| /list/merchant?page={page}&pageSize={pageSize}		| Get products created by merchant	|  x | merchant,admin |
+POST| /save	| Create new product| x  | merchant |
+PUT	| /save	| Update existing product| x  | merchant |
+GET	| /list/available?page={page}&pageSize={pageSize}		| Get available products with inventory > 0 | × | any
+GET	| /list/not-available?page={page}&pageSize={pageSize}		| Get available products with inventory = 0 | × | any
+
+### Order Service
+Manage products information and inventory
+Endpoints
+
+Method	| Path	| Description	| User authenticated	| Role
+------------- | ------------------------- | ------------- |:-------------:| :-------------:|
+GET	| /?page={page}&pageSize={pageSize}		| Get login user orders	|  x | any |
+GET	| /{orderId}	| Get order by id	|  x | any |
+POST| /	| Create new order| x  | client |
+PUT	| /	| Update existing order| x  | client |
+
+
+###  System Services
+Core service to implement Netflix OSS design architecture and Services token security 
+
+### Config Service
+  Provides configuration for all other services (centralize configuration for all services).   <br>
+Details: [Spring Cloud Config](http://cloud.spring.io/spring-cloud-config/spring-cloud-config.html)
+
+### Discovery Service
+It allows automatic detection of network locations for service instances, which could have dynamically assigned addresses because of auto-scaling, 
+failures and upgrades (Every service register in this service after running).   <br>
+Details: [Spring Cloud Netflix](https://spring.io/projects/spring-cloud-netflix)
+
 
 ### Gateway Service
 

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -24,6 +25,7 @@ public class OrderController {
      * it'snot supposed to use it within an annotated controller.
      * Solution use ResponseEntity
      */
+    @PreAuthorize("hasAnyAuthority('SCOPE_client')")
     @PostMapping // save
     @PutMapping  // update
     public Mono<ResponseEntity> saveOrder(@RequestBody ShoppingCart shoppingCart, JwtAuthenticationToken auth) {
@@ -35,8 +37,9 @@ public class OrderController {
     }
 
     @GetMapping("/{orderId}")
-    Mono<ShoppingCart> getOrder(@PathVariable("orderId") Long orderId) {
-        return orderService.getShoppingCart(orderId);
+    Mono<ShoppingCart> getOrder(@PathVariable("orderId") Long orderId, JwtAuthenticationToken auth) {
+        String email = auth.getTokenAttributes().get("client_id").toString();
+        return orderService.getShoppingCart(orderId, email);
     }
 
     @GetMapping
