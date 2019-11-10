@@ -8,6 +8,8 @@ import demo.ecommerce.repository.order.ShoppingCartItemRepository;
 import demo.ecommerce.repository.order.ShoppingCartRepository;
 import demo.ecommerce.repository.product.ProductRepository;
 import demo.ecommerce.repository.user.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -18,13 +20,12 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 public class OrderService {
 
     private static String PRODUCT_NOT_AVAILABLE_MESSAGE = "Product %s is not Available";
+    private static Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     @Autowired
     ShoppingCartItemRepository shoppingCartItemRepository;
@@ -52,7 +54,20 @@ public class OrderService {
     DatabaseClient db;
 
 
-    Mono<ShoppingCart> updateCartData(ShoppingCart cart, Flux<Product> productFlux) {
+    Mono<ShoppingCart> updateCartData(ShoppingCart cart, Mono<ShoppingCart> existingCart, Flux<Product> productFlux) {
+        if (existingCart != null) {
+            // delete items removed by user
+            existingCart.flatMap(ecart -> {
+                HashSet<Long> newItemsId = new HashSet();
+                cart.getCartItemList().forEach(i -> {
+                    if (i.getId() != null) newItemsId.add(i.getId());
+                });
+                //existingItems.stream().filter(i -> )
+                List<ShoppingCartItem> deletedItems = ecart.getCartItemList().stream().filter(i -> !newItemsId.contains(i.getId())).collect(Collectors.toList());
+                if (deletedItems.size() > 0) deleteCartItems(deletedItems).subscribe();
+                return Mono.just(ecart);
+            }).subscribe();
+        }
         return productFlux.collectList().flatMap(products -> {
             BigDecimal totalCost = BigDecimal.ZERO;
             BigDecimal totalShipping = BigDecimal.ZERO;
@@ -83,11 +98,7 @@ public class OrderService {
         });
     }
 
-    private Mono<ShoppingCart> validateQuantities(ShoppingCart cart, Function<ShoppingCart, Mono<ShoppingCart>> onSuccess, Function<String, Mono<ShoppingCart>> onFail) {
-        Mono<ShoppingCart> existingCart = null;
-        if (cart.getId() != null) {
-            existingCart = shoppingCartRepository.findById(cart.getId()).flatMap(this::fillCartWithCartItems);
-        }
+    private Mono<ShoppingCart> validateQuantities(ShoppingCart cart, Mono<ShoppingCart> existingCart, BiFunction<ShoppingCart, Mono<ShoppingCart>, Mono<ShoppingCart>> onSuccess, Function<String, Mono<ShoppingCart>> onFail) {
 
         // get all products ids from  cart items
         List<Long> productIds = cart.getCartItemList().stream().map(itm -> itm.getProduct().getId()).collect(Collectors.toList());
@@ -111,7 +122,7 @@ public class OrderService {
         }
         AtomicInteger index = new AtomicInteger(0);
         StringBuilder errorMessageBuilder = new StringBuilder();
-        Flux<Product> validProducts = newCartProducts.filter(product -> {
+        Flux<Product> validProducts = products.filter(product -> {
             int cartIndex = index.getAndIncrement();
             if (product.getInventoryCounts() >= cart.getCartItemList().get(cartIndex).getQuantity()) {
                 return true;
@@ -125,7 +136,7 @@ public class OrderService {
         return validProducts.count().flatMap(validCount ->
                 products.count().flatMap(allproductsCount -> {
                     if (validCount.equals(allproductsCount)) {
-                        return onSuccess.apply(cart);
+                        return onSuccess.apply(cart, existingCart);
                     } else {
 
                         return onFail.apply(errorMessageBuilder.toString());
@@ -150,31 +161,48 @@ public class OrderService {
 
     }
 
-    private Flux<Product> updateCartProductQuantities(ShoppingCart cart) {
+    private Flux<Product> updateCartProductQuantities(ShoppingCart cart, Mono<ShoppingCart> existingCart) {
         final Mono<Map<Long, Product>> oldProductsRestored;
+
         // if edit CartOrder increase counts of products from old cart
-        if (cart.getId() != null) {
-            Mono<ShoppingCart> existingCart = shoppingCartRepository.findById(cart.getId()).flatMap(this::fillCartWithCartItems);
+        if (existingCart != null) {
             oldProductsRestored = existingCart.flatMap(this::restoreProductsQuantities);
         } else {
             oldProductsRestored = Mono.just(new HashMap<>());
         }
 
-        AtomicInteger indexer = new AtomicInteger(0);
         List<Long> productIds = cart.getCartItemList().stream().map(item -> item.getProduct().getId()).collect(Collectors.toList());
         Flux<Product> newCartProducts = productRepository.findAllById(productIds);
 
-        return newCartProducts.flatMap(newProduct -> {
 
-            return oldProductsRestored.flatMap(oldProductsMap -> {
-                if (oldProductsMap.containsKey(newProduct.getId())) {
-                    Product product = oldProductsMap.get(newProduct.getId());
-                    product.decreaseInventory(cart.getCartItemList().get(indexer.getAndIncrement()).getQuantity());
-                    return Mono.just(product);
-                } else {
-                    newProduct.decreaseInventory(cart.getCartItemList().get(indexer.getAndIncrement()).getQuantity());
-                    return Mono.just(newProduct);
+        return newCartProducts.collectList().flatMapMany(newProducts -> {
+            Map<Long, Product> newProductMap = new HashMap<>();
+            newProducts.forEach(np -> newProductMap.put(np.getId(), np));
+
+            return oldProductsRestored.flatMapMany(oldProductsMap -> {
+
+                List<Product> productsToSave = new ArrayList<>();
+
+                for (int i = 0; i < newProducts.size(); i++) {
+                    if (oldProductsMap.containsKey(newProducts.get(i).getId())) {
+                        Product product = oldProductsMap.get(newProducts.get(i).getId());
+                        product.decreaseInventory(cart.getCartItemList().get(i).getQuantity());
+                        productsToSave.add(product);
+                    } else {
+                        newProducts.get(i).decreaseInventory(cart.getCartItemList().get(i).getQuantity());
+                        productsToSave.add(newProducts.get(i));
+                    }
                 }
+
+
+                // find delete items products to save them
+                List<Product> deletedProducts = oldProductsMap.keySet().stream()
+                        .filter(opk -> !newProductMap.containsKey(opk))
+                        .flatMap(deletedProductIds -> Stream.of(oldProductsMap.get(deletedProductIds))).collect(Collectors.toList());
+                productsToSave.addAll(deletedProducts);
+
+                return Flux.fromArray(productsToSave.toArray(new Product[0]));
+
             });
 
         });
@@ -184,15 +212,19 @@ public class OrderService {
 
     public Mono<ShoppingCart> saveShoppingCart(ShoppingCart cart, String email) {
         return userRepository.getUserByEmail(email).flatMap(user -> {
+            Mono<ShoppingCart> existingCartMono = null;
             cart.setUserId(user.getId());
             if (cart.getId() == null) {
                 cart.setCreatedOn(new Date());
+            } else {
+                existingCartMono = shoppingCartRepository.findById(cart.getId()).flatMap(this::fillCartWithCartItems);
             }
             cart.setUpdatedOn(new Date());
 
             // validate client not save another cart
-            return validateUserId(cart, user).flatMap(vc ->
-                    validateQuantities(cart, this::internalSaveShoppingCart, errorMessage -> {
+            final Mono<ShoppingCart> tempExistingCart = existingCartMono;
+            return validateUserId(cart, existingCartMono, user).flatMap(vc ->
+                    validateQuantities(cart, tempExistingCart, this::internalSaveShoppingCart, errorMessage -> {
                         throw new IllegalArgumentException(errorMessage);
                     })
             );
@@ -202,10 +234,9 @@ public class OrderService {
 
     }
 
-    Mono<ShoppingCart> validateUserId(ShoppingCart cart, User user) {
+    Mono<ShoppingCart> validateUserId(ShoppingCart cart, Mono<ShoppingCart> cartMono, User user) {
 
-        if (cart.getId() != null) {
-            Mono<ShoppingCart> cartMono = shoppingCartRepository.findById(cart.getId());
+        if (cartMono != null) {
             return validateUserId(cartMono, user);
         }
         return Mono.just(cart);
@@ -221,13 +252,14 @@ public class OrderService {
     }
 
     // You should never call a blocking method within a method that returns a reactive type
-    private Mono<ShoppingCart> internalSaveShoppingCart(ShoppingCart shoppingCart) {
+    private Mono<ShoppingCart> internalSaveShoppingCart(ShoppingCart shoppingCart, Mono<ShoppingCart> existingCartMono) {
 
         // update product Quantities and save into database
-        // i don't call subscribe here because the next function call will call flapMap
-        Flux<Product> savedProducts = productRepository.saveAll(updateCartProductQuantities(shoppingCart)); //.subscribe
+        Flux<Product> savedProducts = productRepository.saveAll(updateCartProductQuantities(shoppingCart, existingCartMono));
+        savedProducts.subscribe(products -> logger.info("Update product quantities"));
 
-        Mono<ShoppingCart> savedShoppingCart = updateCartData(shoppingCart, savedProducts).flatMap(cartWithData -> shoppingCartRepository.save(cartWithData));
+        Mono<ShoppingCart> savedShoppingCart = updateCartData(shoppingCart, existingCartMono, savedProducts).flatMap(cartWithData -> shoppingCartRepository.save(cartWithData));
+
 
         // assign saveShoppingCart is required to fill with data enhanced from calling flatMap
         savedShoppingCart = savedShoppingCart.flatMap(savedCart -> {
@@ -237,6 +269,7 @@ public class OrderService {
                 cartItem.setShoppingCartId(savedCart.getId());
                 cartItem.setProductId(cartItem.getProduct().getId());
             });
+
 
             // calling subscribe/flatMap/... is a must to actually save in database otherwise data will not saved to database.
             Flux<ShoppingCartItem> cartItemFlux = shoppingCartItemRepository.saveAll(shoppingCart.getCartItemList()).flatMap(this::fillCartItemWithProduct);
@@ -251,6 +284,9 @@ public class OrderService {
         return savedShoppingCart;
     }
 
+    public Mono<Void> deleteCartItems(List<ShoppingCartItem> cartItems) {
+        return shoppingCartItemRepository.deleteAll(cartItems);
+    }
 
     public Mono<ShoppingCart> getShoppingCart(Long cartId, String email) {
 

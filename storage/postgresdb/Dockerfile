@@ -1,6 +1,10 @@
 FROM postgres:11
 MAINTAINER Mostafa Albana
+
 EXPOSE 5432:5433
+ENV PGDATA /var/lib/postgresql-static/data
+VOLUME  ["$PGDATA"]
+RUN mkdir -p $PGDATA
 
 ENV DATABASE_SCHEMA=ecommerce
 ENV DATABASE_PORT=5432

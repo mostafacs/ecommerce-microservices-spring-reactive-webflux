@@ -4,7 +4,6 @@ services:
 
   postgresdb:
     build: storage/postgresdb
-    restart: always
     env_file:
       - common.env
     ports:

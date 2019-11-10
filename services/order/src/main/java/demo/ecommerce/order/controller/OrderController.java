@@ -26,8 +26,7 @@ public class OrderController {
      * Solution use ResponseEntity
      */
     @PreAuthorize("hasAnyAuthority('SCOPE_client')")
-    @PostMapping // save
-    @PutMapping  // update
+    @PostMapping("/save") // save
     public Mono<ResponseEntity> saveOrder(@RequestBody ShoppingCart shoppingCart, JwtAuthenticationToken auth) {
         String email = auth.getTokenAttributes().get("client_id").toString();
         return orderService.saveShoppingCart(shoppingCart, email).
@@ -36,13 +35,30 @@ public class OrderController {
                 .onErrorResume(ex -> Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage())));
     }
 
+    @PutMapping("/save")
+    public Mono<ResponseEntity> updateOrder(JwtAuthenticationToken auth, @RequestBody ShoppingCart shoppingCart) {
+
+        if (shoppingCart.getId() == null)
+            throw new IllegalArgumentException("Cart id is required to update existing cart");
+        String email = auth.getTokenAttributes().get("client_id").toString();
+        return orderService.saveShoppingCart(shoppingCart, email).
+                flatMap(cart -> Mono.just(ResponseEntity.ok(cart)))
+                .cast(ResponseEntity.class)
+                .onErrorResume(ex -> {
+                    ex.printStackTrace();
+                    return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage()));
+                });
+    }
+
+    @PreAuthorize("hasAnyAuthority('SCOPE_client')")
     @GetMapping("/{orderId}")
     Mono<ShoppingCart> getOrder(@PathVariable("orderId") Long orderId, JwtAuthenticationToken auth) {
         String email = auth.getTokenAttributes().get("client_id").toString();
         return orderService.getShoppingCart(orderId, email);
     }
 
-    @GetMapping
+    @PreAuthorize("hasAnyAuthority('SCOPE_client')")
+    @GetMapping("/list/user")
     Mono<Page<ShoppingCart>> getAllShoppingCart(JwtAuthenticationToken auth, @RequestParam Integer page, @RequestParam Integer pageSize) {
         String email = auth.getTokenAttributes().get("client_id").toString();
         return orderService.getUserShoppingCarts(email, PageRequest.of(page, pageSize));
