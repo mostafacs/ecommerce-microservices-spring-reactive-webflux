@@ -24,7 +24,7 @@ Secured, Authorized and Paginated endpoints.
 ## Functional services
 
 ### Authentication Service
-Authorization responsibilities for all other services which grants [OAuth2 tokens](https://tools.ietf.org/html/rfc6749) for the backend resource services.
+Authorization Server for all other services which grants [OAuth2 tokens](https://tools.ietf.org/html/rfc6749) for the backend resource services.
 All other secured services must set jwk uri for endpoint implemented on this service.
 ```spring:
    security:
