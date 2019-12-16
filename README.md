@@ -5,7 +5,7 @@ Implement based on [Microservice Architecture Pattern](http://martinfowler.com/m
 
 
 ## Abstract
-In this project I didn't built independent microservices But i have implement microservices share database Why?
+In this project I didn't built independent microservices But i implemented microservices share the same database Why?
 Because I want to use database tools like `ACID transactions, joins, bulk files imports, ...`
 instead of network overhead for interprocess communication between microservices.
 I worked in a large project implemented based on microservices architecture we have a set of independent services and 
